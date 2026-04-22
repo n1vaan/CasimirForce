@@ -6,3 +6,5 @@ This project simulates the Casimir Effect in nontrivial geometries using a Monte
 Instead of solving electromagnetic field equations directly, the Casimir interaction is approximated by sampling large ensembles of random closed paths (“worldlines”) and determining how they interact with bounding surfaces.
 
 The goal is to study how geometry influences vacuum forces, and to investigate the limitations of common approximations such as the Proximity Force Approximation.
+
+![My Image](img/diagram.png)

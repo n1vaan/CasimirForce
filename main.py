@@ -1,5 +1,7 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 
 # ============================================================
@@ -258,6 +260,17 @@ def estimate_energy_proxy(
 
     return energy_proxy, stats
 
+def vary_color(base_color, amount=0.3):
+    # If it's already RGB, use directly
+    if isinstance(base_color, tuple) or isinstance(base_color, list):
+        base = np.array(base_color)
+    else:
+        base = np.array(mcolors.to_rgb(base_color))
+
+    noise = np.random.uniform(-amount, amount, size=3)
+    new_color = np.clip(base + noise, 0, 1)
+    return new_color
+
 # ============================================================
 # 5. VISUALIZATION OF GEOMETRY + SAMPLE LOOPS
 # ============================================================
@@ -289,8 +302,18 @@ def plot_geometry_and_loops(
     plt.figure(figsize=(10, 6))
 
     # Surfaces
-    plt.plot(x_plot, yb, linewidth=2, label="Bottom plate")
-    plt.plot(x_plot, yt, linewidth=2, label="Top corrugated plate")
+    plt.plot(x_plot, yb,
+            color="black",
+            linewidth=3,
+            zorder=10,
+            label="Bottom plate")
+
+    plt.plot(x_plot, yt,
+            color="black",
+            linewidth=3,
+            zorder=10,
+            label="Top corrugated plate")
+
 
     for _ in range(n_show):
         loop = generate_closed_loop(n_points=n_points, loop_scale=loop_scale, rng=rng)
@@ -300,28 +323,49 @@ def plot_geometry_and_loops(
 
         hit_bottom, hit_top, hit_both = classify_loop(loop, a=a, A=A, lam=lam)
 
+        # Assign color family
         if hit_both:
-            alpha = 1
-            lw = 1.5
+            base_color = "#34eb67"
+            lw = 2.2
+            alpha = 0.9
             zorder = 3
-        elif hit_bottom or hit_top:
+
+        elif hit_bottom:
+            base_color = "#0abeff"
+            lw = 1.4
             alpha = 0.5
-            lw = 1.0
             zorder = 2
+
+        elif hit_top:
+            base_color = "#ff4a56"
+            lw = 1.4
+            alpha = 0.5
+            zorder = 2
+
         else:
-            alpha = 0.1
+            base_color = (0,0,0)
             lw = 0.8
+            alpha = 0.1
             zorder = 1
 
-        plt.plot(loop[:, 0], loop[:, 1], alpha=alpha, linewidth=lw, zorder=zorder)
+        # Slight variation for natural look
+        color = vary_color(base_color, amount=0.15)
 
-    plt.xlim(x_domain)
+        plt.plot(loop[:, 0], loop[:, 1],
+                color=color,
+                linewidth=lw,
+                alpha=alpha,
+                zorder=zorder)    
+        plt.xlim(x_domain)
+             
     plt.ylim(y_domain)
     plt.xlabel("x")
     plt.ylabel("y")
     plt.title("Corrugated Geometry with Sample Worldlines")
     plt.legend()
     plt.grid(True, alpha=0.3)
+    plt.savefig("img/diagram.png", dpi=300, bbox_inches="tight")
+
     plt.show()
 
 
@@ -373,6 +417,8 @@ def plot_energy_vs_separation(a_values, energies):
     plt.ylabel("Energy proxy")
     plt.title("Energy Proxy vs Separation")
     plt.grid(True, alpha=0.3)
+    # save figure
+    plt.savefig("img/plot.png", dpi=300, bbox_inches="tight")
     plt.show()
 
 
@@ -388,12 +434,12 @@ if __name__ == "__main__":
 
     # Show sample loops and geometry
     plot_geometry_and_loops(
-        n_show=80,
+        n_show=180,
         n_points=250,
-        loop_scale=0.28,
+        loop_scale=0.42,
         x_domain=(-4, 4),
         y_domain=(-0.6, 2.4),
-        a=a,
+        a=0.85,
         A=A,
         lam=lam,
         seed=2

@@ -8,3 +8,5 @@ Instead of solving electromagnetic field equations directly, the Casimir interac
 The goal is to study how geometry influences vacuum forces, and to investigate the limitations of common approximations such as the Proximity Force Approximation.
 
 ![My Image](img/diagram.png)
+
+https://math.mit.edu/~stevenj/papers/Johnson11.pdf
